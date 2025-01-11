@@ -25,6 +25,11 @@ public class PostService {
         User user = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        // ADD THIS LINE
+        if (user.isResigned()) {
+            throw new IllegalStateException("Resigned user cannot create post");
+        }
+
         Post post = Post.builder()
             .author(user)
             .title(request.getTitle())
@@ -54,6 +59,11 @@ public class PostService {
 
         if (!post.isAuthor(request.getUserId())) {
             throw new IllegalStateException("Only author can update post");
+        }
+
+        // ADD THIS LINE
+        if (post.getAuthor().isResigned()) {
+            throw new IllegalStateException("Resigned author cannot update post");
         }
 
         post.update(request.getTitle(), request.getContent());
